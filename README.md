@@ -8,7 +8,7 @@ It's an experiment which involves:
 * using full screen resolution (preventing browser from doing downscaling)
 
 # Demo
-Demo is available at: [https://knee-cola.github.io/basic-stereo-sphere-vr-viewer-experiment/](https://knee-cola.github.io/basic-stereo-sphere-vr-viewer-experiment/)
+Demo is available at: [https://bit.ly/2TOSacT](https://bit.ly/2TOSacT)
 
 This viewer is intended to be used with a Google Cardboard compatible viewer.
 
