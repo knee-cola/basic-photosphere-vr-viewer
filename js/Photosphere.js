@@ -147,7 +147,7 @@ THREE.Photosphere = function (domEl, image, options) {
 			sphere_H_segments = 64,
 			sphere_V_segments = 64;
 
-		var texture = THREE.ImageUtils.loadTexture('/textures/paklenica.jpg');
+		var texture = THREE.ImageUtils.loadTexture('./textures/paklenica.jpg');
 		texture.anisotropy = renderer.getMaxAnisotropy();
 //		texture.minFilter = THREE.LinearMipMapLinearFilter;
 //		texture.minFilter = THREE.LinearMipMapLinearFilter;
@@ -172,7 +172,7 @@ THREE.Photosphere = function (domEl, image, options) {
 			sphere_H_segments = 64,
 			sphere_V_segments = 64;
 
-		var texture = THREE.ImageUtils.loadTexture('/textures/paklenica.jpg');
+		var texture = THREE.ImageUtils.loadTexture('./textures/paklenica.jpg');
 		texture.anisotropy = renderer.getMaxAnisotropy();
 
 		sphere = new THREE.Mesh(
