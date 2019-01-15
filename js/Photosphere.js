@@ -234,7 +234,7 @@ THREE.Photosphere = function (domEl, image, options) {
 		// 1080 x 1920
 //		var win = $(window);
 
-		debugLog(width+'-'+height);
+//		debugLog(width+'-'+height);
 
 		if(camera) {
 			camera.aspect = width / height;
