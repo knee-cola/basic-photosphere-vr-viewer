@@ -4,44 +4,51 @@ THREE.Photosphere = function (domEl, image, options) {
 	var camera, controls, scene, renderer, sphere, element, textMesh;
 	var clock = new THREE.Clock();
 	var debugDiv = document.getElementById('debug');
+	let reqAnimationFrame;
 
-	setupViewport();
-	init();
-	update_new(clock.getDelta());
-	animate_new();
+//	setupViewport();
+	init().then(()=> {
+		update_new(clock.getDelta());
+		animate_new();
+	});
 
 	// POKUŠATI slijedeći source: http://vr.chromeexperiments.com/, koji je trivijalno jednostavan, pa ga prilagoditi
 	// ... stvar prilagodim tako da ne prikazuje sferu
 
 	function init () {
 
+		setupWebVR();
+
 		makeRenderer();
 		makeScene();
-		attachControls(camera);
 
-		makeSphere();
+		let promise = attachControls(camera).then(() => {
+			makeSphere();
 
-		makeLight(scene);
+			makeLight(scene);
+	
+			// kreiram grupu u ću rotirati
+			var pivot = new THREE.Object3D();
+			
+			camera.add( pivot );
+	
+			// podešavam poziciju grupe u odnosu na ishodište
+			pivot.position.x = 0;
+			pivot.position.y = -5;
+			pivot.position.z = -30;
+	
+			// kreiram tekst i smještam ga u koordinatama pivota (unutar njega)
+			var textMesh = makeText('Sandica', {x:-10, y:0, z:-10});
+			pivot.add( textMesh );
+	
+			// rotiram pivot
+			animateObj(pivot);
+	
+			window.addEventListener('resize', resize_new, false);
+			setTimeout(resize_new, 1);
+		});
 
-		// kreiram grupu u ću rotirati
-		var pivot = new THREE.Object3D();
-		
-		camera.add( pivot );
-
-		// podešavam poziciju grupe u odnosu na ishodište
-		pivot.position.x = 0;
-		pivot.position.y = -5;
-		pivot.position.z = -30;
-
-		// kreiram tekst i smještam ga u koordinatama pivota (unutar njega)
-		var textMesh = makeText('Sandica', {x:-10, y:0, z:-10});
-		pivot.add( textMesh );
-
-		// rotiram pivot
-		animateObj(pivot);
-
-		window.addEventListener('resize', resize_new, false);
-		setTimeout(resize_new, 1);
+		return(promise);
 	}
 
 	function makeRenderer() {
@@ -51,23 +58,23 @@ THREE.Photosphere = function (domEl, image, options) {
 		
 		domEl.appendChild(element);
 
-		// smao desktopi imaju devicePixelRatio===1
-		if(window.devicePixelRatio !== 1) {
-			effect = new THREE.StereoEffect(renderer);
-		}
+//preWebVR		// samo desktopi imaju devicePixelRatio===1
+//preWebVR		if(window.devicePixelRatio !== 1) {
+//preWebVR			effect = new THREE.StereoEffect(renderer);
+//preWebVR		}
 	}
 
 
 	function makeScene() {
-		scene = new THREE.Scene();
+//preWebVR		let fieldOfView = options.view || 90,
+//preWebVR			aspectRatio = 1, // domEl.offsetWidth / domEl.offsetHeight,
+//preWebVR			near = 1,
+//preWebVR			far = 1000;
+//preWebVR
+//preWebVR		// http://threejs.org/docs/#Reference/Cameras/PerspectiveCamera
+//preWebVR		camera = new THREE.PerspectiveCamera(fieldOfView, aspectRatio, near, far);
+		camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
 
-		let fieldOfView = options.view || 90,
-			aspectRatio = 1, // domEl.offsetWidth / domEl.offsetHeight,
-			near = 1,
-			far = 1000;
-
-		// http://threejs.org/docs/#Reference/Cameras/PerspectiveCamera
-		camera = new THREE.PerspectiveCamera(fieldOfView, aspectRatio, near, far);
 //		camera.position.set(0.1, options.y || 0, 0);
 	
 		let pos = {
@@ -76,16 +83,55 @@ THREE.Photosphere = function (domEl, image, options) {
 			z: 0
 		};
 		camera.position.set(pos.x, pos.y, pos.z);
+
+		scene = new THREE.Scene();
 		scene.add(camera);
+
+		return(camera);
 	}
 
-	function attachControls(target) {
+	function attachControls(camera) {
 
-		controls = new THREE.OrbitControls(target, element);
-		controls.noPan = true;
-		controls.noZoom = true;
+		// The polyfill provides this in the event this browser
+		// does not support WebVR 1.1
+		return(
+			navigator.getVRDisplays().then(function (vrDisplays) {
 
-		controls.rotateUp(-Math.PI/2); // rotiram kameru da gleda u horizont
+				// If we have a native display, or we have a CardboardVRDisplay
+				// from the polyfill, use it
+				if (vrDisplays.length) {
+
+					vrDisplay = vrDisplays[0];
+					// Apply VR headset positional data to camera.
+					controls = new THREE.VRControls(camera);
+
+					// register a function which kicks off the render loop.
+					reqAnimationFrame = animate => vrDisplay.requestAnimationFrame(animate);
+					
+				}
+				// Otherwise, we're on a desktop environment with no native
+				// displays, so provide controls for a monoscopic desktop view
+				else {
+					controls = new THREE.OrbitControls(camera, element);
+					controls.noPan = true;
+					controls.noZoom = true;
+			
+					controls.rotateUp(-Math.PI/2); // rotiram kameru da gleda u horizont
+
+	//				controls = new THREE.OrbitControls(camera);
+	//				controls.target.set(0, 0, -1);
+	//				// Disable the "Enter VR" button
+	//				var enterVRButton = document.querySelector('#vr');
+	//				enterVRButton.disabled = true;
+	//				// Kick off the render loop.
+	//				requestAnimationFrame(animate);
+
+					// register a function which kicks off the render loop.
+					reqAnimationFrame = animate => requestAnimationFrame(animate);
+				}
+			})
+		);
+
 //		controls.rotateLeft(Math.PI / 2);
 
 		// ne znam točno kaj ovdje radim ... ono kaj znam je da ako je to uključeno kamera gleda u određenom smjeru
@@ -99,21 +145,21 @@ THREE.Photosphere = function (domEl, image, options) {
 ////		controls.autoRotateSpeed = options.speed || 0.5;
 ////		controls.addEventListener('change', render_original);   <---- ovo je loše - bolje se vezati za CLOCK
 
-		function setOrientationControls(e) {
-		  if (!e.alpha) {
-			return;
-		  }
-  
-		  controls = new THREE.DeviceOrientationControls(camera, true);
-		  controls.connect();
-		  controls.update();
-  
-		  element.addEventListener('click', fullscreen_new, false);
-  
-		  window.removeEventListener('deviceorientation', setOrientationControls, true);
-		}
-
-		window.addEventListener('deviceorientation', setOrientationControls, true);
+//pre-webVR		function setOrientationControls(e) {
+//pre-webVR		  if (!e.alpha) {
+//pre-webVR			return;
+//pre-webVR		  }
+//pre-webVR  
+//pre-webVR		  controls = new THREE.DeviceOrientationControls(camera, true);
+//pre-webVR		  controls.connect();
+//pre-webVR		  controls.update();
+//pre-webVR  
+//pre-webVR		  element.addEventListener('click', fullscreen_new, false);
+//pre-webVR  
+//pre-webVR		  window.removeEventListener('deviceorientation', setOrientationControls, true);
+//pre-webVR		}
+//pre-webVR
+//pre-webVR		window.addEventListener('deviceorientation', setOrientationControls, true);
 	}
 
 	function makeGround () {
@@ -263,7 +309,7 @@ THREE.Photosphere = function (domEl, image, options) {
 
 	function animate_new(dt) {
 		TWEEN.update();
-		requestAnimationFrame(animate_new);
+		reqAnimationFrame(animate_new);
 
 		if(controls) {
 			controls.update(dt);
@@ -364,6 +410,32 @@ THREE.Photosphere = function (domEl, image, options) {
 		tweenBack.chain(tweenHead);
 
 		tweenHead.start();
+	}
+
+	function setupWebVR() {
+
+		// Get config from URL
+		var config = (function() {
+			var config = {};
+			var q = window.location.search.substring(1);
+			if (q === '') {
+				return config;
+			}
+			var params = q.split('&');
+			var param, name, value;
+			for (var i = 0; i < params.length; i++) {
+			param = params[i].split('=');
+			name = param[0];
+			value = param[1];
+			// All config values are either boolean or float
+			config[name] = value === 'true' ? true :
+							value === 'false' ? false :
+							parseFloat(value);
+			}
+			return config;
+		})();
+
+		new WebVRPolyfill(config);
 	}
 
 	return;
