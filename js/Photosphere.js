@@ -37,9 +37,9 @@ THREE.Photosphere = function (domEl, image, options) {
 			pivot.position.y = -5;
 			pivot.position.z = -30;
 	
-			// kreiram tekst i smještam ga u koordinatama pivota (unutar njega)
-			var textMesh = makeText('Sandica', {x:-10, y:0, z:-10});
-			pivot.add( textMesh );
+//			// kreiram tekst i smještam ga u koordinatama pivota (unutar njega)
+//			var textMesh = makeText('Sphere', {x:-10, y:0, z:-10});
+//			pivot.add( textMesh );
 	
 			// rotiram pivot
 			animateObj(pivot);
@@ -52,16 +52,22 @@ THREE.Photosphere = function (domEl, image, options) {
 	}
 
 	function makeRenderer() {
-		effect = renderer = new THREE.WebGLRenderer();
+		renderer = new THREE.WebGLRenderer();
 		renderer.setSize(domEl.offsetWidth, domEl.offsetHeight);
 		element = renderer.domElement;
-		
+
+		renderer.setPixelRatio(Math.floor(window.devicePixelRatio));
+				
 		domEl.appendChild(element);
 
 //preWebVR		// samo desktopi imaju devicePixelRatio===1
 //preWebVR		if(window.devicePixelRatio !== 1) {
 //preWebVR			effect = new THREE.StereoEffect(renderer);
 //preWebVR		}
+
+		// Apply VR stereo rendering to renderer.
+		effect = new THREE.VREffect(renderer);
+		effect.setSize(domEl.offsetWidth, domEl.offsetHeight, false);
 	}
 
 
