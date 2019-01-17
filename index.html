@@ -1,9 +1,11 @@
 <html>
 <head>
 	<title></title>
-	<meta name="viewport" content=""/>
-
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no">
 	<meta name="mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
 	<link rel="shortcut icon" type="image/ico" href="./favicon.ico">
 	<style>
 		html, body, { }
@@ -31,11 +33,21 @@
       		color: black;
       		font-size: 9px;
       	}
-
+		#buttons {
+			position: fixed;
+			top: 0;
+			right: 0;
+			z-index: 1;
+			background: white;
+		}
     </style>
 </head>
 <body>
-
+	<div id="buttons">
+		<button id="fullscreen">Fullscreen</button>
+		<button id="vr">VR (WebVR/Mobile only)</button>
+	</div>
+	
 	<div id="sphere"></div>
 	<!--
 	<div id="debug"></div>

@@ -325,42 +325,19 @@ THREE.Photosphere = function (domEl, image, options) {
 		render_new(clock.getDelta());
 	}
 
+//	function onFullscreen() {
+//		window.setTimeout(function() {
+//			var $viewport = $('head meta[name="viewport"]');
+//		}, 1000);
+//	}
 
-	var fsEvAttached = false;
-
-	function fullscreen_new() {
-
-		if (domEl.requestFullscreen) {
-			if(!fsEvAttached) { document.addEventListener("fullscreenchange", onFullscreen, false); }
-			domEl.requestFullscreen();
-		} else if (domEl.msRequestFullscreen) {
-			if(!fsEvAttached) { document.addEventListener("msfullscreenchange", onFullscreen, false); }
-			domEl.msRequestFullscreen();
-		} else if (domEl.mozRequestFullScreen) {
-			if(!fsEvAttached) { document.addEventListener("mozfullscreenchange", onFullscreen, false); }
-			domEl.mozRequestFullScreen();
-		} else if (domEl.webkitRequestFullscreen) {
-			if(!fsEvAttached) { document.addEventListener("webkitfullscreenchange", onFullscreen, false); }
-			domEl.webkitRequestFullscreen();
-		}
-
-		fsEvAttached = true;
-	}
-
-	function onFullscreen() {
-
-		window.setTimeout(function() {
-			var $viewport = $('head meta[name="viewport"]');
-		}, 1000);
-	}
-
-	function setupViewport() {
-		var nativeW = window.devicePixelRatio * window.screen.availWidth,
-			scale = 1/window.devicePixelRatio;
-
-		var $viewport = $('head meta[name="viewport"]');
-		$viewport.attr('content', 'initial-scale='+scale+'; maximum-scale='+scale+'; user-scalable=0;');
-	}
+//preWebVR	function setupViewport() {
+//preWebVR		var nativeW = window.devicePixelRatio * window.screen.availWidth,
+//preWebVR			scale = 1/window.devicePixelRatio;
+//preWebVR
+//preWebVR		var $viewport = $('head meta[name="viewport"]');
+//preWebVR		$viewport.attr('content', 'initial-scale='+scale+'; maximum-scale='+scale+'; user-scalable=0;');
+//preWebVR	}
 
 //	//----------------------------------------------------------------------
 //	function render_original() {
@@ -444,7 +421,32 @@ THREE.Photosphere = function (domEl, image, options) {
 		new WebVRPolyfill(config);
 	}
 
-	return;
+	window.addEventListener('vrdisplaypresentchange', 	() => {
+		console.log('onVRDisplayPresentChange');
+		onResize();
+		buttons.hidden = vrDisplay.isPresenting;
+	  });
+
+	window.addEventListener('vrdisplayconnect', ev => {
+		console.log('onVRDisplayConnect', (ev.display || (ev.detail && ev.detail.display)));
+	  });
+
+	// Button click handlers.
+	document.querySelector('button#fullscreen').addEventListener('click', function() {
+	  const el = renderer.domElement;
+		if (el.requestFullscreen) {
+		  el.requestFullscreen();
+		} else if (el.mozRequestFullScreen) {
+		  el.mozRequestFullScreen();
+		} else if (el.webkitRequestFullscreen) {
+		  el.webkitRequestFullscreen();
+		} else if (el.msRequestFullscreen) {
+		  el.msRequestFullscreen();
+		}
+	});
+	document.querySelector('button#vr').addEventListener('click', function() {
+	  vrDisplay.requestPresent([{source: renderer.domElement}]);
+	});
 
 //	return({
 //		resize: resize_original,
