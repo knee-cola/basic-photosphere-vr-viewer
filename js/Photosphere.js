@@ -400,6 +400,7 @@ THREE.Photosphere = function (domEl, image, options) {
 		// Get config from URL
 		var config = (function() {
 			var config = {
+				DEBUG: true,
 				DPDB_URL: "./js/lib/dpdb.json"
 			};
 			var q = window.location.search.substring(1);
