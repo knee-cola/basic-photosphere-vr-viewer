@@ -1,4 +1,4 @@
-THREE.Photosphere = function (domEl, image, options) {
+	THREE.Photosphere = function (domEl, image, options) {
 	options = options || {};
 
 	var camera, controls, scene, renderer, sphere, element, textMesh;
@@ -6,7 +6,8 @@ THREE.Photosphere = function (domEl, image, options) {
 	var debugDiv = document.getElementById('debug');
 	let reqAnimationFrame;
 
-//	setupViewport();
+	setupViewport();
+
 	init().then(()=> {
 		update_new(clock.getDelta());
 		animate_new();
@@ -199,7 +200,7 @@ THREE.Photosphere = function (domEl, image, options) {
 			sphere_H_segments = 64,
 			sphere_V_segments = 64;
 
-		var texture = THREE.ImageUtils.loadTexture('./textures/R0010823_20161001114020.JPG');
+		var texture = THREE.ImageUtils.loadTexture('./textures/PANO_20150214_153009.jpg');
 		texture.anisotropy = renderer.getMaxAnisotropy();
 //		texture.minFilter = THREE.LinearMipMapLinearFilter;
 //		texture.minFilter = THREE.LinearMipMapLinearFilter;
@@ -224,7 +225,7 @@ THREE.Photosphere = function (domEl, image, options) {
 			sphere_H_segments = 64,
 			sphere_V_segments = 64;
 
-		var texture = THREE.ImageUtils.loadTexture('./textures/R0010823_20161001114020.JPG');
+		var texture = THREE.ImageUtils.loadTexture('./textures/PANO_20150214_153009.jpg');
 		texture.anisotropy = renderer.getMaxAnisotropy();
 
 		sphere = new THREE.Mesh(
@@ -327,17 +328,20 @@ THREE.Photosphere = function (domEl, image, options) {
 
 //	function onFullscreen() {
 //		window.setTimeout(function() {
-//			var $viewport = $('head meta[name="viewport"]');
-//		}, 1000);
+//			setupViewport();
+//		}, 0);
 //	}
 
-//preWebVR	function setupViewport() {
-//preWebVR		var nativeW = window.devicePixelRatio * window.screen.availWidth,
-//preWebVR			scale = 1/window.devicePixelRatio;
-//preWebVR
-//preWebVR		var $viewport = $('head meta[name="viewport"]');
-//preWebVR		$viewport.attr('content', 'initial-scale='+scale+'; maximum-scale='+scale+'; user-scalable=0;');
-//preWebVR	}
+	function setupViewport() {
+
+		console.log(`setupViewport(${window.devicePixelRatio})`);
+
+		var //nativeW = window.devicePixelRatio * window.screen.availWidth,
+			scale = 1/window.devicePixelRatio;
+
+		var $viewport = $('head meta[name="viewport"]');
+		$viewport.attr('content', 'initial-scale='+scale+'; maximum-scale='+scale+'; user-scalable=0;');
+	}
 
 //	//----------------------------------------------------------------------
 //	function render_original() {
@@ -400,7 +404,7 @@ THREE.Photosphere = function (domEl, image, options) {
 		// Get config from URL
 		var config = (function() {
 			var config = {
-				DEBUG: true,
+//				DEBUG: true,
 				DPDB_URL: "./js/lib/dpdb.json"
 			};
 			var q = window.location.search.substring(1);
@@ -423,6 +427,8 @@ THREE.Photosphere = function (domEl, image, options) {
 
 		new WebVRPolyfill(config);
 	}
+
+	window.addEventListener('resize', onResize);
 
 	window.addEventListener('vrdisplaypresentchange', 	() => {
 		console.log('onVRDisplayPresentChange');
@@ -450,6 +456,26 @@ THREE.Photosphere = function (domEl, image, options) {
 	document.querySelector('button#vr').addEventListener('click', function() {
 	  vrDisplay.requestPresent([{source: renderer.domElement}]);
 	});
+
+	function onResize() {
+
+//		window.setTimeout(() => {
+//			setupViewport();
+//		}, 2000);
+
+		// The delay ensures the browser has a chance to layout
+		// the page and update the clientWidth/clientHeight.
+		// This problem particularly crops up under iOS.
+		if (!onResize.resizeDelay) {
+		  onResize.resizeDelay = setTimeout(function () {
+			onResize.resizeDelay = null;
+			console.log('Resizing to %s x %s.', element.clientWidth, element.clientHeight);
+			effect.setSize(element.clientWidth, element.clientHeight, false);
+			camera.aspect = element.clientWidth / element.clientHeight;
+			camera.updateProjectionMatrix();
+		  }, 250);
+		}
+	  }
 
 //	return({
 //		resize: resize_original,

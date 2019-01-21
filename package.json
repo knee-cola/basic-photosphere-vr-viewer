@@ -1,0 +1,22 @@
+{
+  "name": "basic-stereo-sphere-vr-viewer-experiment",
+  "version": "1.0.0",
+  "description": "This is a simple photosphere VR viewer for smartphones",
+  "main": "index.js",
+  "scripts": {
+    "start": "http-server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/knee-cola/basic-stereo-sphere-vr-viewer-experiment.git"
+  },
+  "author": "Nikola Derežić",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/knee-cola/basic-stereo-sphere-vr-viewer-experiment/issues"
+  },
+  "homepage": "https://github.com/knee-cola/basic-stereo-sphere-vr-viewer-experiment#readme",
+  "devDependencies": {
+    "http-server": "^0.11.1"
+  }
+}

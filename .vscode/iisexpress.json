@@ -1,5 +1,6 @@
 {
   "port": 37948,
+  "address": "192.168.1.161",
   "path": "c:\\web-projects\\basic-stereo-sphere-vr-viewer-experiment",
   "clr": "v4.0",
   "protocol": "http"
