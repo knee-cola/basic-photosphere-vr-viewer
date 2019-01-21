@@ -22,3 +22,7 @@ It might not work so great on larger screens due to the greater distance between
 The following features are desired:
 * support for different screen sizes
 * support for different cardboard boxes (image distortion)
+
+# NoSleep
+Device can be prevented from going into sleep by playing a video.
+Here's a finished lib: https://www.npmjs.com/package/nosleep.js
