@@ -8,7 +8,7 @@ It's an experiment which involves:
 * using full screen resolution (preventing browser from doing downscaling)
 
 # Demo
-Demo is available at: [https://bit.ly/2TOSacT](https://bit.ly/2TOSacT)
+Demo is available at: [https://knee-cola.github.io/basic-photosphere-vr-viewer/](https://knee-cola.github.io/basic-photosphere-vr-viewer/)
 
 This viewer is intended to be used with a Google Cardboard compatible viewer.
 
