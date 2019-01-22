@@ -4,7 +4,10 @@
   "description": "This is a simple photosphere VR viewer for smartphones.",
   "main": "index.js",
   "dependencies": {
-    "three": "^0.100.0"
+    "device-orientation-controls": "^1.1.0",
+    "three": "^0.100.0",
+    "three.orientation": "^1.1.1",
+    "threejs-orbit-controls": "^1.0.3"
   },
   "devDependencies": {
     "webpack": "^4.29.0",
