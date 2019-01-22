@@ -24,5 +24,7 @@ The following features are desired:
 * support for different cardboard boxes (image distortion)
 
 # NoSleep
-Device can be prevented from going into sleep by playing a video.
-Here's a finished lib: https://www.npmjs.com/package/nosleep.js
+NoSleep is for some reason not working
+
+# BT Controller
+* use BT controller to fine-tune disply parameters (eyeSep, FOV etc...)

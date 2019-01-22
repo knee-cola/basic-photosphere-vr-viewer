@@ -5,6 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "device-orientation-controls": "^1.1.0",
+    "nosleep.js": "^0.9.0",
     "three": "^0.100.0",
     "three.orientation": "^1.1.1",
     "threejs-orbit-controls": "^1.0.3"

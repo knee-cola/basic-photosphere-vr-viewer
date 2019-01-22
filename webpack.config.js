@@ -8,6 +8,8 @@ module.exports = {
     path: path.resolve(__dirname, 'docs')
   },
   devServer: {
-    contentBase: './docs'
+    contentBase: './docs',
+    host: '0.0.0.0', // listen on all IP addresses
+    port: 8080
   },
 };

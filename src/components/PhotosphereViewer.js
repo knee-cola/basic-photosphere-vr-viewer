@@ -57,6 +57,15 @@ export class PhotosphereViewer {
         this.scene.add(this.camera);
 
         this.effect = new StereoEffect(this.renderer);
+
+        this.effect.setEyeSeparation(-6);
+
+//        this.eyeSeparation = -10;
+//
+//        this.renderer.domElement.addEventListener('click', () => {
+//            this.effect.setEyeSeparation(this.eyeSeparation++);
+//        });  
+
     }
 
     setupLight() {
@@ -73,10 +82,11 @@ export class PhotosphereViewer {
         
         // IF no viewport <meta> exists in the document
         // > create one
-        if(!viewportMeta) {
+        if(viewportMeta.length === 0) {
             viewportMeta = document.createElement('META');
-            viewportMeta.name = "viewport";
-            document.getElementsByTagName('head')[0].appendChild(viewportMeta);
+            viewportMeta.name = 'viewport';
+            document.head.appendChild(viewportMeta);
+
         } else {
             viewportMeta=viewportMeta[0]; // filter function returns an array
         }
@@ -98,7 +108,7 @@ export class PhotosphereViewer {
             this.controls.update();
 
             // user interaction is needed for the fullscreen to be activated
-            domEl.addEventListener('click', this.gotoFullscreen.bind(this), false);  
+//            domEl.addEventListener('click', this.gotoFullscreen.bind(this), false);  
 		} else {
             this.controls = new OrbitControls(this.camera, domEl);
             this.controls.noPan = true;
@@ -113,7 +123,7 @@ export class PhotosphereViewer {
 
     gotoFullscreen() {
 
-        const domEl = this.renderer.domElement;
+        const domEl = document.body;
         let eventName;
 
 		if (domEl.requestFullscreen) {
@@ -157,8 +167,8 @@ export class PhotosphereViewer {
 
     adjustSize() {
         const domEl = this.renderer.domElement,
-              width = domEl.offsetWidth,
-              height = domEl.offsetHeight;
+              width = window.innerWidth,
+              height = window.innerHeight;
 
         this.camera.aspect = width / height;
         this.camera.updateProjectionMatrix();
