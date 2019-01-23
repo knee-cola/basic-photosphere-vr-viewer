@@ -6,9 +6,9 @@ import * as NoSleep from 'nosleep.js';
 export class WakeLockPolyfill {
     enable() {
         // https://developers.google.com/web/updates/2018/12/wakelock
+        // NOTE: Wake Lock API is only available when served over HTTPS
         if ('getWakeLock' in navigator) {
             navigator.getWakeLock('screen').then((wakeLockObj) => {
-                this.wakeLockObj = wakeLockObj;
                 this.wakeLockRequest = wakeLockObj.createRequest();
             }).catch((err) => {
               return console.error('Could not obtain wake lock', err);
@@ -20,9 +20,9 @@ export class WakeLockPolyfill {
     }
 
     disable() {
-        if(this.wakeLockObj) {
-            this.wakeLockObj.cancel();
-            this.wakeLockObj = null;
+        if(this.wakeLockRequest) {
+            this.wakeLockRequest.cancel();
+            this.wakeLockRequest = null;
         } else {
             this.noSleep.disable();
             this.noSleep = null;
