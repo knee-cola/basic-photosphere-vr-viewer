@@ -31,10 +31,10 @@ export class PhotosphereViewer {
         this.renderer = new WebGLRenderer();
 
         const domEl = this.renderer.domElement;
-        const devicePixelRatio = window.devicePixelRatio;
         
-		this.renderer.setSize(window.innerWidth*devicePixelRatio, window.innerHeight*devicePixelRatio);
-        
+		this.renderer.setSize(window.innerWidth, window.innerHeight);
+        this.renderer.setPixelRatio(window.devicePixelRatio);
+
         document.body.appendChild(domEl);
 
         this.scene = new Scene();
@@ -169,9 +169,8 @@ export class PhotosphereViewer {
 
     adjustSize() {
         const domEl = this.renderer.domElement,
-              devicePixelRatio = window.devicePixelRatio,
-              width = window.innerWidth*devicePixelRatio,
-              height = window.innerHeight*devicePixelRatio;
+              width = window.innerWidth,
+              height = window.innerHeight;
 
         this.camera.aspect = width / height;
         this.camera.updateProjectionMatrix();
