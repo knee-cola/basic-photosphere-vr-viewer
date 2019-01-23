@@ -35,7 +35,7 @@ const enterVR = () => {
         // screen orientation can be locked only in fullscreen mode
         lockOrientation();
 
-        window.history.pushState({}, null, "/vr/");
+        window.history.pushState({}, null, window.location.pathname+"vr/");
 
         window.onpopstate = (event) => {
             exitVR();
