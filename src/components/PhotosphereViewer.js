@@ -11,9 +11,9 @@ export class PhotosphereViewer {
         this.adjustSize = this.adjustSize.bind(this);
         this.doLoopAnimations = this.doLoopAnimations.bind(this);
         this.onFullscreen = this.onFullscreen.bind(this);
-        this.setupViewport = this.setupViewport.bind(this);
+        // this.setupViewport = this.setupViewport.bind(this);
 
-        this.setupViewport();
+        // this.setupViewport();
 		this.setupRenderer();
         this.setupCamera();
 		this.setupLight();
@@ -31,7 +31,8 @@ export class PhotosphereViewer {
         this.renderer = new WebGLRenderer();
 
         const domEl = this.renderer.domElement;
-		this.renderer.setSize(window.innerWidth, window.innerHeight);
+        const devicePixelRatio = window.devicePixelRatio;
+		this.renderer.setSize(window.innerWidth*devicePixelRatio, window.innerHeight*devicePixelRatio);
         
         document.body.appendChild(domEl);
 
@@ -73,29 +74,29 @@ export class PhotosphereViewer {
 		this.scene.add(new HemisphereLight(0xffffff, 0x000000, 1));
     }
 
-    /**
-     * Scales viewport so that native pixel density is used
-     */
-	setupViewport() {
-
-        let viewportMeta = [].filter.call(document.getElementsByTagName('meta'), el => el.name === "viewport");
-        
-        // IF no viewport <meta> exists in the document
-        // > create one
-        if(viewportMeta.length === 0) {
-            viewportMeta = document.createElement('META');
-            viewportMeta.name = 'viewport';
-            document.head.appendChild(viewportMeta);
-
-        } else {
-            viewportMeta=viewportMeta[0]; // filter function returns an array
-        }
-
-        const scale = 1/window.devicePixelRatio;
-
-        // scale viewpoer
-		viewportMeta.setAttribute('content', `initial-scale=${scale}, maximum-scale=${scale}, user-scalable=0`);
-    }
+//    /**
+//     * Scales viewport so that native pixel density is used
+//     */
+//	setupViewport() {
+//
+//        let viewportMeta = [].filter.call(document.getElementsByTagName('meta'), el => el.name === "viewport");
+//        
+//        // IF no viewport <meta> exists in the document
+//        // > create one
+//        if(viewportMeta.length === 0) {
+//            viewportMeta = document.createElement('META');
+//            viewportMeta.name = 'viewport';
+//            document.head.appendChild(viewportMeta);
+//
+//        } else {
+//            viewportMeta=viewportMeta[0]; // filter function returns an array
+//        }
+//
+//        const scale = 1/window.devicePixelRatio;
+//
+//        // scale viewpoer
+//		viewportMeta.setAttribute('content', `initial-scale=${scale}, maximum-scale=${scale}, user-scalable=0`);
+//    }
     
     setupControls() {
         const domEl = this.renderer.domElement;
@@ -147,7 +148,7 @@ export class PhotosphereViewer {
     }
 
     onFullscreen() {
-		window.setTimeout(this.setupViewport, 0);
+		// window.setTimeout(this.setupViewport, 0);
     }
 
     startAnimationLoop() {
@@ -167,8 +168,9 @@ export class PhotosphereViewer {
 
     adjustSize() {
         const domEl = this.renderer.domElement,
-              width = window.innerWidth,
-              height = window.innerHeight;
+              devicePixelRatio = window.devicePixelRatio;
+              width = window.innerWidth*devicePixelRatio,
+              height = window.innerHeight*devicePixelRatio;
 
         this.camera.aspect = width / height;
         this.camera.updateProjectionMatrix();
