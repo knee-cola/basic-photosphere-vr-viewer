@@ -34,18 +34,18 @@ const enterVR = () => {
 
         // screen orientation can be locked only in fullscreen mode
         lockOrientation();
+
+        window.history.pushState({}, null, "/vr/");
+
+        window.onpopstate = (event) => {
+            exitVR();
+            enterHomescreen();
+        };
     
         window.setTimeout(() => {
             _viewer = new PhotosphereViewer('../textures/R0010823_20161001114020.JPG');
         }, 0);
     });
-
-    window.history.pushState({}, null, "/vr/");
-
-	window.onpopstate = (event) => {
-        exitVR();
-        enterHomescreen();
-	};
 };
 
 const exitVR = () => {
