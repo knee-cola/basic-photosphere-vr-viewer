@@ -87,7 +87,8 @@ const handleFullscreenExit = () => {
     if (!document.fullscreen) {
         exitVR();
         // return to previous URL (the root one)
-        window.history.popState();
+        window.history.back();
+        enterHomescreen();
     }
 };
 
