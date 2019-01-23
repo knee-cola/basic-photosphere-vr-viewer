@@ -5,7 +5,10 @@ It's an experiment which involves:
 * rendering of a photosphere
 * headtracking
 * stereoscopic rendering
-* using full screen resolution (preventing browser from doing downscaling)
+* using native pixel density (preventing browser from doing downscaling)
+* preventing smartphone from going to sleep
+* locking screen orientation
+* using fullscreen mode
 
 # Demo
 Demo is available at: [https://knee-cola.github.io/basic-photosphere-vr-viewer/](https://knee-cola.github.io/basic-photosphere-vr-viewer/)
@@ -13,18 +16,20 @@ Demo is available at: [https://knee-cola.github.io/basic-photosphere-vr-viewer/]
 This viewer is intended to be used with a Google Cardboard compatible viewer.
 
 Make sure to open it in your smartphone (Chrome or Firefox should we fine).
-Tap the screen once to go to fullscreen.
 
 **Note:** the viewer works fine on Samsung Galaxy S5 or similar sized displays.
 It might not work so great on larger screens due to the greater distance between center points of each image (due to larger screen). This will hopefully be fixed some day (see *Future roadmap* chapter) 
 
 # Future roadmap
-The following features are desired:
-* support for different screen sizes
-* support for different cardboard boxes (image distortion)
 
-# NoSleep
-NoSleep is for some reason not working
+## Basic functionality
+* fix exit VR on smartphones (FOV)
+    * use BT controller to fine-tune display parameters (eyeSep, FOV etc...)
+* fix headset lense distortion
 
-# BT Controller
-* use BT controller to fine-tune disply parameters (eyeSep, FOV etc...)
+## Implementing settings
+* display VR settings menu
+    * use BT controller for navigation
+* test screen for setting up distortion (square grid)
+* test screen for setting up eye separation (cross on white background)
+* persisting settings in browser (local storage?)
