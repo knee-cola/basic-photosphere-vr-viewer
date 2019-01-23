@@ -5,6 +5,7 @@ import * as NoSleep from 'nosleep.js';
  */
 export class WakeLockPolyfill {
     enable() {
+        // https://developers.google.com/web/updates/2018/12/wakelock
         if ('getWakeLock' in navigator) {
             navigator.getWakeLock('screen').then((wakeLockObj) => {
                 this.wakeLockObj = wakeLockObj;
