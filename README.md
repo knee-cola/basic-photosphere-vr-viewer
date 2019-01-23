@@ -6,9 +6,10 @@ It's an experiment which involves:
 * headtracking
 * stereoscopic rendering
 * using native pixel density (preventing browser from doing downscaling)
-* preventing smartphone from going to sleep
+* preventing smartphone from going to sleep (WakeLock API)
 * locking screen orientation
 * using fullscreen mode
+* using game controller (Gamepad API)
 
 # Demo
 Demo is available at: [https://knee-cola.github.io/basic-photosphere-vr-viewer/](https://knee-cola.github.io/basic-photosphere-vr-viewer/)
