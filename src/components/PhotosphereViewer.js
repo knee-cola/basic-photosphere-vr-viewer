@@ -10,11 +10,8 @@ export class PhotosphereViewer {
         // binding methods used as event handlers
         this.adjustSize = this.adjustSize.bind(this);
         this.doLoopAnimations = this.doLoopAnimations.bind(this);
-        this.onFullscreen = this.onFullscreen.bind(this);
-        // this.setupViewport = this.setupViewport.bind(this);
 
-        // this.setupViewport();
-		this.setupRenderer();
+        this.setupRenderer();
         this.setupCamera();
 		this.setupLight();
 		this.setupControls();
@@ -75,30 +72,6 @@ export class PhotosphereViewer {
 		this.scene.add(new HemisphereLight(0xffffff, 0x000000, 1));
     }
 
-//    /**
-//     * Scales viewport so that native pixel density is used
-//     */
-//	setupViewport() {
-//
-//        let viewportMeta = [].filter.call(document.getElementsByTagName('meta'), el => el.name === "viewport");
-//        
-//        // IF no viewport <meta> exists in the document
-//        // > create one
-//        if(viewportMeta.length === 0) {
-//            viewportMeta = document.createElement('META');
-//            viewportMeta.name = 'viewport';
-//            document.head.appendChild(viewportMeta);
-//
-//        } else {
-//            viewportMeta=viewportMeta[0]; // filter function returns an array
-//        }
-//
-//        const scale = 1/window.devicePixelRatio;
-//
-//        // scale viewpoer
-//		viewportMeta.setAttribute('content', `initial-scale=${scale}, maximum-scale=${scale}, user-scalable=0`);
-//    }
-    
     setupControls() {
         const domEl = this.renderer.domElement;
 
@@ -108,9 +81,6 @@ export class PhotosphereViewer {
             this.controls = new DeviceOrientationControls(this.camera);
             this.controls.connect();
             this.controls.update();
-
-            // user interaction is needed for the fullscreen to be activated
-//            domEl.addEventListener('click', this.gotoFullscreen.bind(this), false);  
 		} else {
             this.controls = new OrbitControls(this.camera, domEl);
             this.controls.noPan = true;
@@ -123,41 +93,15 @@ export class PhotosphereViewer {
         this.photoSphere = new Photosphere(this.scene, this.renderer, textureFileUrl);
     }
 
-    gotoFullscreen() {
-
-        const domEl = document.body;
-        let eventName;
-
-		if (domEl.requestFullscreen) {
-			eventName = "fullscreenchange";
-			domEl.requestFullscreen();
-		} else if (domEl.msRequestFullscreen) {
-			eventName = "msfullscreenchange";
-			domEl.msRequestFullscreen();
-		} else if (domEl.mozRequestFullScreen) {
-			eventName = "mozfullscreenchange";
-			domEl.mozRequestFullScreen();
-		} else if (domEl.webkitRequestFullscreen) {
-			eventName = "webkitfullscreenchange";
-			domEl.webkitRequestFullscreen();
-		}
-
-        if(!this.fsEvAttached) {
-            document.addEventListener(eventName, this.onFullscreen, false);
-            this.fsEvAttached = true;
-        }
-    }
-
-    onFullscreen() {
-		// window.setTimeout(this.setupViewport, 0);
-    }
-
     startAnimationLoop() {
         this.clock = new THREE.Clock();
         requestAnimationFrame(this.doLoopAnimations);
     }
 
     doLoopAnimations() {
+        if(this.isDisposed) {
+            return;
+        }
         const dt = this.clock.getDelta();
 
         this.controls.update(dt);
@@ -177,5 +121,11 @@ export class PhotosphereViewer {
 
         this.renderer.setSize(width, height);
         this.effect.setSize(width, height);
+    }
+
+    dispose() {
+        this.isDisposed = true;
+        document.body.removeChild(this.renderer.domElement);
+        this.renderer.dispose();
     }
 }
