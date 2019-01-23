@@ -36,7 +36,12 @@ const enterVR = () => {
         lockOrientation();
     
         window.setTimeout(() => {
-            _viewer = new PhotosphereViewer('../textures/R0010823_20161001114020.JPG');
+            // PANO_20140421_163314.jpg --- Tuzla statues
+            // PANO_20140421_162454.jpg --- Tuzla center
+            // PANO_20140421_152929.jpg --- Tuzla wide square
+            // PANO_20150214_153009.jpg --- (HD) old house Susak
+
+            _viewer = new PhotosphereViewer('../textures/PANO_20150214_153009_HD.jpg');
         }, 0);
     });
 };
