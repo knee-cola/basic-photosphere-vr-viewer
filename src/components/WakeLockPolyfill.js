@@ -10,12 +10,10 @@ export class WakeLockPolyfill {
             navigator.getWakeLock('screen').then((wakeLockObj) => {
                 this.wakeLockObj = wakeLockObj;
                 this.wakeLockRequest = wakeLockObj.createRequest();
-                alert('using wakeLock !!!');
             }).catch((err) => {
               return console.error('Could not obtain wake lock', err);
             });
         } else {
-            alert('using noSleep');
             this.noSleep = new NoSleep();
             this.noSleep.enable();
         }
