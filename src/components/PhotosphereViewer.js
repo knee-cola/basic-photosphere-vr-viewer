@@ -32,6 +32,7 @@ export class PhotosphereViewer {
 
         const domEl = this.renderer.domElement;
         const devicePixelRatio = window.devicePixelRatio;
+        
 		this.renderer.setSize(window.innerWidth*devicePixelRatio, window.innerHeight*devicePixelRatio);
         
         document.body.appendChild(domEl);
@@ -168,7 +169,7 @@ export class PhotosphereViewer {
 
     adjustSize() {
         const domEl = this.renderer.domElement,
-              devicePixelRatio = window.devicePixelRatio;
+              devicePixelRatio = window.devicePixelRatio,
               width = window.innerWidth*devicePixelRatio,
               height = window.innerHeight*devicePixelRatio;
 
