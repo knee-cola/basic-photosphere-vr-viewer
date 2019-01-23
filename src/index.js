@@ -64,11 +64,45 @@ const enterFullscreen = () => {
     const fsElement = document.documentElement;
     const requestFullscreen = fsElement.requestFullscreen || fsElement.msRequestFullscreen || fsElement.mozRequestFullScreen || fsElement.webkitRequestFullscreen;
 
-    return(requestFullscreen.call(fsElement));
+    return(requestFullscreen.call(fsElement).then(() => {
+        // after the fullscreen is activated
+        // register listener which will detect
+        // when fullscreen exit event -> it will
+        document.addEventListener(getFullscreenEventName(), handleFullscreenExit, false);
+    }));
 };
 
 const exitFullscreen = () => {
+    // make sure that the event handler IS not registered
+    // > we don't want it to be called when VR is exited manually
+    document.removeEventListener(getFullscreenEventName(), handleFullscreenExit, false);
+
+    // check if fullscreen is active
+    // before trying to exit it
     if (document.fullscreen) { document.exitFullscreen() };
+}
+
+const handleFullscreenExit = () => {
+    // only react if the fullscreen has been deactivated
+    if (!document.fullscreen) {
+        exitVR();
+        // return to previous URL (the root one)
+        window.history.popState();
+    }
+};
+
+const getFullscreenEventName = () => {
+    const fsElement = document.documentElement;
+
+    if (fsElement.requestFullscreen) {
+        return("fullscreenchange");
+    } else if (fsElement.msRequestFullscreen) {
+        return("msfullscreenchange");
+    } else if (fsElement.mozRequestFullScreen) {
+        return("mozfullscreenchange");
+    } else if (fsElement.webkitRequestFullscreen) {
+        return("webkitfullscreenchange");
+    }
 }
 
 const lockOrientation = () => {
