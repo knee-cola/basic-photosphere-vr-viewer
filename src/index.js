@@ -34,13 +34,6 @@ const enterVR = () => {
 
         // screen orientation can be locked only in fullscreen mode
         lockOrientation();
-
-        window.history.pushState({}, null, window.location.pathname+"vr/");
-
-        window.onpopstate = (event) => {
-            exitVR();
-            enterHomescreen();
-        };
     
         window.setTimeout(() => {
             _viewer = new PhotosphereViewer('../textures/R0010823_20161001114020.JPG');
@@ -86,8 +79,6 @@ const handleFullscreenExit = () => {
     // only react if the fullscreen has been deactivated
     if (!document.fullscreen) {
         exitVR();
-        // return to previous URL (the root one)
-        window.history.back();
         enterHomescreen();
     }
 };
