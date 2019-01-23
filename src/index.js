@@ -68,7 +68,7 @@ const enterFullscreen = () => {
 };
 
 const exitFullscreen = () => {
-    return(document.documentElement.exitFullscreen());
+    if (document.fullscreen) { document.exitFullscreen() };
 }
 
 const lockOrientation = () => {
