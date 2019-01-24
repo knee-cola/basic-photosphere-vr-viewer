@@ -41,7 +41,7 @@ const enterVR = () => {
             // PANO_20140421_152929.jpg --- Tuzla wide square
             // PANO_20150214_153009_HD.jpg --- (HD) old house Susak
 
-            _viewer = new PhotosphereViewer('../textures/PANO_20150214_153009_HD.jpg');
+            _viewer = new PhotosphereViewer('../textures/PANO_20140421_163314.jpg');
         }, 0);
     });
 };
