@@ -1,4 +1,4 @@
-import { Mesh, ImageUtils, SphereGeometry, MeshBasicMaterial, BackSide} from 'three';
+import { Mesh, RepeatWrapping, SphereGeometry, MeshBasicMaterial, BackSide} from 'three';
 
 const _sphere_radius = 100,
       _sphere_H_segments = 64,
@@ -24,6 +24,11 @@ export class Photosphere {
 			// onLoad callback
 			loadedTexture => {
 				loadedTexture.anisotropy = this.renderer.capabilities.getMaxAnisotropy();
+				// texture needs to be flipped horizonatally
+				// since rendering it on the inner side of a sphrere
+				// will flip it  
+				loadedTexture.wrapS = RepeatWrapping;
+				loadedTexture.repeat.x=-1;
 
 				this.sphereMesh = new Mesh(
 					new SphereGeometry(_sphere_radius, _sphere_H_segments, _sphere_V_segments),
