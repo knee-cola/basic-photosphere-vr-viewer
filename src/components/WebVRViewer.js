@@ -163,7 +163,8 @@ export class WebVRViewer {
     configWebVR() {
         var config = (function() {
             var config = {
-
+                // https://github.com/mrdoob/three.js/issues/9749
+                // BUFFER_SCALE: 1
             };
             var q = window.location.search.substring(1);
             if (q === '') {
