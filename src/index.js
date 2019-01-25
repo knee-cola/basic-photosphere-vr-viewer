@@ -56,7 +56,10 @@ const _makeButton = (title, vrMode) => {
 
 const prepWebVr = () => {
     document.addEventListener(getFullscreenEventName(), handleFullscreenChange, false);
-    _viewer = new WebVRViewer('../textures/PANO_20140421_163314.jpg');
+    _viewer = new WebVRViewer('../textures/PANO_20140421_163314.jpg', () => {
+        exitVR();
+        enterHomescreen();
+    });
 }
 
 const exitHomescreen = () => {

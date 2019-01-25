@@ -7,7 +7,8 @@ import VRControls from 'three-vrcontrols-module';
 import WebVRPolyfill from 'webvr-polyfill';
 
 export class WebVRViewer {
-    constructor(textureFileUrl) {
+    constructor(textureFileUrl, exitHandler) {
+        this.exitHandler = exitHandler;
         this.init(textureFileUrl);
     }
 
@@ -33,6 +34,8 @@ export class WebVRViewer {
     }
 
     start() {
+        document.body.appendChild(this.renderer.domElement);
+        
         // Kick off the render loop.
         this.startAnimationLoop();
 
@@ -45,12 +48,8 @@ export class WebVRViewer {
     setupRenderer() {
         this.renderer = new WebGLRenderer();
 
-        const domEl = this.renderer.domElement;
-        
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.renderer.setPixelRatio(window.devicePixelRatio);
-
-        document.body.appendChild(domEl);
 
         this.scene = new Scene();
     }
@@ -189,8 +188,14 @@ export class WebVRViewer {
         return(new WebVRPolyfill(config));
     }
 
-    handleVRDisplayPresentChange() {
-        this.adjustSize();
+    handleVRDisplayPresentChange(ev) {
+        if(ev.display.isPresenting) {
+            this.adjustSize();
+        } else {
+            if(this.exitHandler) {
+                this.exitHandler();
+            }
+        }
     }
 
     dispose() {

@@ -22,6 +22,9 @@ Make sure to open it in your smartphone (Chrome or Firefox should we fine).
 It might not work so great on larger screens due to the greater distance between center points of each image (due to larger screen). This will hopefully be fixed some day (see *Future roadmap* chapter) 
 
 # Future roadmap
+* move the fullscreen switching, orientation locking and WakeLock from index.js to `ThreeViewer.js`
+* standardize how each viewer is started (split it in two steps: 1-init, 2-start)
+
 
 ## Basic functionality
 * fix exit VR on smartphones (FOV)
