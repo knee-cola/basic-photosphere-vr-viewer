@@ -12,7 +12,7 @@ let _vrMode;
 
 const enterHomescreen = () => {
     _button_startThreeVR = _makeButton("START VR", VR_MODE_THREE);
-    _button_startWebVR = _makeButton("START WebVR", VR_MODE_WEBVR);
+    _button_startWebVR = _makeButton("INIT WebVR", VR_MODE_WEBVR);
 }
 
 const _makeButton = (title, vrMode) => {
@@ -21,16 +21,48 @@ const _makeButton = (title, vrMode) => {
     document.body.appendChild(newButton);
 
     newButton.addEventListener('click', () => {
-        exitHomescreen();
         _vrMode = vrMode;
-        enterVR();
+
+        switch(_vrMode) {
+            case VR_MODE_WEBVR:
+                if(!_viewer) {
+                    // Switch to the fullscreen, which is the last step of starting process,
+                    // requires that it's initiated by user action, which will
+                    // not the be the case due to the async nature of the initi process.
+                    // Thant's why starting WebVR is a two-step process:
+                    // (1) first we do the init (prepWebVr)
+                    // (2) then user needs to initialte the start (_viewer.start)
+                    prepWebVr();
+
+                    document.body.removeChild(_button_startThreeVR);
+                    _button_startThreeVR = null;
+
+                    // the same button will be used to initiate the second step
+                    _button_startWebVR.innerHTML = "SHOW WebVR";
+                } else {
+                    exitHomescreen();
+                    _viewer.start();
+                }
+                break;
+            case VR_MODE_THREE:
+                exitHomescreen();
+                enterVR();
+                break;
+        }
     });
 
     return(newButton);
-}    
+}
+
+const prepWebVr = () => {
+    document.addEventListener(getFullscreenEventName(), handleFullscreenChange, false);
+    _viewer = new WebVRViewer('../textures/PANO_20140421_163314.jpg');
+}
 
 const exitHomescreen = () => {
-    document.body.removeChild(_button_startThreeVR);
+    if(_button_startThreeVR) {
+        document.body.removeChild(_button_startThreeVR);
+    }
     document.body.removeChild(_button_startWebVR);
     _button_startWebVR = _button_startThreeVR = null;
 };
@@ -51,9 +83,7 @@ const enterVR = () => {
             // * locks orientation
             // * goest to fullscreen
             // * activates WakeLock
-            window.setTimeout(() => {
-                _viewer = new WebVRViewer('../textures/PANO_20140421_163314.jpg');
-            }, 0);
+            
             break;
         case VR_MODE_THREE:
             

@@ -8,14 +8,15 @@ import WebVRPolyfill from 'webvr-polyfill';
 
 export class WebVRViewer {
     constructor(textureFileUrl) {
-        this.start(textureFileUrl);
+        this.init(textureFileUrl);
     }
 
-    async start(textureFileUrl) {
+    async init(textureFileUrl) {
         // binding methods used as event handlers
         this.adjustSize = this.adjustSize.bind(this);
         this.doLoopAnimations = this.doLoopAnimations.bind(this);
-
+        this.handleVRDisplayPresentChange = this.handleVRDisplayPresentChange.bind(this);
+        
         this.configWebVR();
 
         this.setupRenderer();
@@ -24,18 +25,21 @@ export class WebVRViewer {
 		this.setupLight();
 
         await this.setupControls();
-
+        
         this.loadPhotosphere(textureFileUrl);
+        
+        window.addEventListener('resize', this.adjustSize, false);
+        window.addEventListener('vrdisplaypresentchange', this.handleVRDisplayPresentChange);
+    }
 
-        this.adjustSize();
-
-        // kick off fullscreen view
-        this.vrDisplay.requestPresent([{source: this.renderer.domElement}]);
-
+    start() {
         // Kick off the render loop.
         this.startAnimationLoop();
 
-        window.addEventListener('resize', this.adjustSize, false);
+        // window.setTimeout(() => { this.vrDisplay.requestPresent([{source: this.renderer.domElement}]); }, 500);
+        this.vrDisplay.requestPresent([{source: this.renderer.domElement}])
+            .then(() => {})
+            .catch(err => console.dir(err));
     }
 
     setupRenderer() {
@@ -43,7 +47,7 @@ export class WebVRViewer {
 
         const domEl = this.renderer.domElement;
         
-		this.renderer.setSize(window.innerWidth, window.innerHeight);
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.renderer.setPixelRatio(window.devicePixelRatio);
 
         document.body.appendChild(domEl);
@@ -81,31 +85,30 @@ export class WebVRViewer {
 		this.scene.add(new HemisphereLight(0xffffff, 0x000000, 1));
     }
 
-    setupControls() {
+    async setupControls() {
 
         // The polyfill provides this in the event this browser
         // does not support WebVR 1.1
-        return(navigator.getVRDisplays().then(vrDisplays => {
-            // If we have a native display, or we have a CardboardVRDisplay
-            // from the polyfill, use it
-            if (vrDisplays.length) {
-                this.vrDisplay = vrDisplays[0];
-                // Apply VR headset positional data to camera.
-                this.controls = new VRControls(this.camera);
+        let vrDisplays = await navigator.getVRDisplays();
+        // If we have a native display, or we have a CardboardVRDisplay
+        // from the polyfill, use it
+        if (vrDisplays.length) {
+            this.vrDisplay = vrDisplays[0];
+            // Apply VR headset positional data to camera.
+            this.controls = new VRControls(this.camera);
 
-                // define function to be used to start animation loop
-                this.requestAnimationFrame = loopFn => this.vrDisplay.requestAnimationFrame(loopFn);
-            }
-            // Otherwise, we're on a desktop environment with no native
-            // displays, so provide controls for a monoscopic desktop view
-            else {
-                this.controls = new OrbitControls(camera, this.renderer.domElement);
-                this.controls.target.set(0, 0, -1);
-                
-                // define function to be used to start animation loop
-                this.requestAnimationFrame = loopFn => window.requestAnimationFrame(loopFn);
-            }
-        }));
+            // define function to be used to start animation loop
+            this.requestAnimationFrame = loopFn => this.vrDisplay.requestAnimationFrame(loopFn);
+        }
+        // Otherwise, we're on a desktop environment with no native
+        // displays, so provide controls for a monoscopic desktop view
+        else {
+            this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+            this.controls.target.set(0, 0, -1);
+            
+            // define function to be used to start animation loop
+            this.requestAnimationFrame = loopFn => window.requestAnimationFrame(loopFn);
+        }
     }
 
     loadPhotosphere(textureFileUrl) {
@@ -144,6 +147,10 @@ export class WebVRViewer {
                 this.camera.updateProjectionMatrix();
 
                 this.effect.setSize(width, height);
+                // VREffect resets the pixel ratio to 1 each time
+                // each time the `setSize` is called ...
+                // so here we need to correct it back to native ratio
+                this.renderer.setPixelRatio(window.devicePixelRatio);
                 this.renderer.setSize(width, height);
 
                 this.sizeAdjPending = false;
@@ -181,9 +188,15 @@ export class WebVRViewer {
         return(new WebVRPolyfill(config));
     }
 
+    handleVRDisplayPresentChange() {
+        this.adjustSize();
+    }
+
     dispose() {
         this.isDisposed = true;
         document.body.removeChild(this.renderer.domElement);
+        window.removeEventListener('resize', this.adjustSize, false);
+        window.removeEventListener('vrdisplaypresentchange', this.handleVRDisplayPresentChange);
         this.renderer.dispose();
     }
 }
