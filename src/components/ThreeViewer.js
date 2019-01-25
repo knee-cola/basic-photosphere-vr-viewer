@@ -1,11 +1,11 @@
 import {StereoEffect} from './StereoEffect';
-import {Scene, PerspectiveCamera,WebGLRenderer, HemisphereLight} from 'three';
+import {Scene, PerspectiveCamera,WebGLRenderer, HemisphereLight, Clock} from 'three';
 import DeviceOrientationControls from 'three.orientation';
 import OrbitControls from 'threejs-orbit-controls';
 import {Photosphere} from './Photosphere';
 import './ES5Polyfill';
 
-export class PhotosphereViewer {
+export class ThreeViewer {
     constructor(textureFileUrl) {
         // binding methods used as event handlers
         this.adjustSize = this.adjustSize.bind(this);
@@ -13,6 +13,7 @@ export class PhotosphereViewer {
 
         this.setupRenderer();
         this.setupCamera();
+        this.setupStereo();
 		this.setupLight();
 		this.setupControls();
      
@@ -54,7 +55,9 @@ export class PhotosphereViewer {
 		this.camera.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z);
 
         this.scene.add(this.camera);
+    }
 
+    setupStereo() {
         this.effect = new StereoEffect(this.renderer);
 
         this.effect.setEyeSeparation(-6);
@@ -64,7 +67,6 @@ export class PhotosphereViewer {
 //        this.renderer.domElement.addEventListener('click', () => {
 //            this.effect.setEyeSeparation(this.eyeSeparation++);
 //        });  
-
     }
 
     setupLight() {
@@ -94,7 +96,7 @@ export class PhotosphereViewer {
     }
 
     startAnimationLoop() {
-        this.clock = new THREE.Clock();
+        this.clock = new Clock();
         requestAnimationFrame(this.doLoopAnimations);
     }
 
@@ -112,15 +114,26 @@ export class PhotosphereViewer {
     }
 
     adjustSize() {
-        const domEl = this.renderer.domElement,
-              width = window.innerWidth,
-              height = window.innerHeight;
+        // The delay ensures the browser has a chance to layout
+        // the page and update the clientWidth/clientHeight.
+        // This problem particularly crops up under iOS.
+        if (!this.sizeAdjPending) {
+            window.setTimeout(() => {
+                const domEl = this.renderer.domElement,
+                      width = window.innerWidth,
+                      height = window.innerHeight;
+  
+                this.camera.aspect = width / height;
+                this.camera.updateProjectionMatrix();
+        
+                this.effect.setSize(width, height);
+                this.renderer.setSize(width, height);
 
-        this.camera.aspect = width / height;
-        this.camera.updateProjectionMatrix();
+                this.sizeAdjPending = false;
+            }, 250);
+        }
 
-        this.renderer.setSize(width, height);
-        this.effect.setSize(width, height);
+        this.sizeAdjPending = true;
     }
 
     dispose() {
