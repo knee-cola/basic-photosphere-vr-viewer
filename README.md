@@ -22,7 +22,9 @@ Make sure to open it in your smartphone (Chrome or Firefox should we fine).
 It might not work so great on larger screens due to the greater distance between center points of each image (due to larger screen). This will hopefully be fixed some day (see *Future roadmap* chapter) 
 
 # Future roadmap
-* try to remove StereoEffect - see https://rawgit.com/owntheweb/three.js/dev/examples/vr_effect_composer_stereo_camera.html
+* try to remove StereoEffect - see
+    * https://stackoverflow.com/questions/31248397/three-js-combining-stereoeffect-with-fxaa-shaderpass
+    * https://rawgit.com/owntheweb/three.js/dev/examples/vr_effect_composer_stereo_camera.html
 
 ## Basic functionality
 * fix exit VR on smartphones (FOV)

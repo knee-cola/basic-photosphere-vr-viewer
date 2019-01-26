@@ -1,23 +1,31 @@
+/**
+ * Based on http://www.decarpentier.nl/lens-distortion
+ */
+
+import {StereoCamera} from 'three';
 import EffectComposer, { RenderPass, ShaderPass } from 'three-effectcomposer-es6'
 import * as dat from 'dat.gui';
 
 export class DistortionShader {
 
-    constructor(renderer, camera, stereoCamera, scene) {
+    constructor(renderer, camera, scene) {
 
         this.renderer = renderer;
-        this.stereoCamera = stereoCamera;
         this.camera = camera;
         this.scene = scene;
+
+        // https://rawgit.com/owntheweb/three.js/dev/examples/vr_effect_composer_stereo_camera.html
+        this.stereoCamera = new StereoCamera();
+        this.stereoCamera.aspect = 0.5;
 
         this.composer = new EffectComposer(renderer);
 
         this.renderPass = new RenderPass(scene, camera);
         this.composer.addPass(this.renderPass);
 
-//        this.shaderPass = new ShaderPass(this.getDistortionShaderDefinition());
-//        this.shaderPass.renderToScreen = true;
-//        this.composer.addPass(this.shaderPass);
+        this.shaderPass = new ShaderPass(this.getDistortionShaderDefinition());
+        this.shaderPass.renderToScreen = true;
+        this.composer.addPass(this.shaderPass);
 
         this.guiParameters = {
             horizontalFOV:		140,
@@ -29,14 +37,37 @@ export class DistortionShader {
         this.updateDistortionEffect = this.updateDistortionEffect.bind(this);
     }
 
-    render() {
-        this.renderer.setViewport( 0, 0, window.innerWidth / 2, window.innerHeight);
-        this.renderPass.camera = this.camera; //note: bending rule by setting RenderPass.camera directly without set/get methods
-        this.composer.render();
+    setSize(width, height) {
+        this.composer.setSize(width, height);
+        this.composer.reset();
+    }
 
-        this.renderer.setViewport( window.innerWidth / 2, 0, window.innerWidth / 2, window.innerHeight);
-        this.renderPass.camera = this.camera; //note: bending rule by setting RenderPass.camera directly without set/get methods
-        this.composer.render();
+    render() {
+        const { renderer, camera, scene, composer, renderPass, stereoCamera } = this;
+
+        scene.updateMatrixWorld();
+        camera.updateMatrixWorld();
+        stereoCamera.update(camera);
+
+        const {width, height } = renderer.getSize(),
+              top = 0,
+              left = 0,
+              bottom = width,
+              right = height,
+              center = right / 2;
+
+        renderer.clear();
+//        renderer.setScissorTest( true );
+//        renderer.setScissor( left, top, center, bottom);
+        renderer.setViewport( left, top, right, bottom/2);
+        renderPass.camera = camera; //note: bending rule by setting RenderPass.camera directly without set/get methods
+        composer.render();
+
+//        renderer.setViewport( center, top, right, bottom);
+//        renderer.setScissor( center, top, right, bottom);
+//        renderPass.camera = stereoCamera.cameraR; //note: bending rule by setting RenderPass.camera directly without set/get methods
+//        composer.render();
+//        renderer.setScissorTest( false );
     }
 
     showGUI() {
