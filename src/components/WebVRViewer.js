@@ -49,7 +49,7 @@ export class WebVRViewer {
         this.renderer = new WebGLRenderer();
 
         this.renderer.setSize(window.innerWidth, window.innerHeight);
-        this.renderer.setPixelRatio(window.devicePixelRatio);
+//        this.renderer.setPixelRatio(window.devicePixelRatio);
 
         this.scene = new Scene();
     }
@@ -163,7 +163,7 @@ export class WebVRViewer {
         var config = (function() {
             var config = {
                 // https://github.com/mrdoob/three.js/issues/9749
-                // BUFFER_SCALE: 1
+                BUFFER_SCALE: 1
             };
             var q = window.location.search.substring(1);
             if (q === '') {
@@ -193,6 +193,7 @@ export class WebVRViewer {
             this.adjustSize();
         } else {
             if(this.exitHandler) {
+                this.dispose();
                 this.exitHandler();
             }
         }
