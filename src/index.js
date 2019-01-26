@@ -1,17 +1,28 @@
 import { StereoEffectViewer } from './components/StereoEffectViewer';
 import { WebVRViewer } from './components/WebVRViewer';
+import { StereoCameraViewer } from './components/StereoCameraViewer';
 
-let _button_useStereoEffect, _button_useWebVR, _button_startVR;
+const _buttons = [];
 let _viewer;
 
 const enterHomescreen = () => {
 
-    _button_useStereoEffect = _makeButton("USE StereoEffect", () => {
-        document.body.removeChild(_button_useStereoEffect);
-        document.body.removeChild(_button_useWebVR);
+    _makeButton("USE StereoCamera", () => {
+        _clearButtons();
 
-        _button_startVR = _makeButton('START VR', () => {
-            document.body.removeChild(_button_startVR);
+        _makeButton('START VR', () => {
+            _clearButtons();
+
+            _viewer = new StereoCameraViewer(textureUrlGet(), () => {
+                _viewer = null;
+                enterHomescreen();
+            });
+        });
+    });
+    _makeButton("USE StereoEffect", () => {
+        _clearButtons();
+        _makeButton('START VR', () => {
+            _clearButtons();
 
             _viewer = new StereoEffectViewer(textureUrlGet(), () => {
                 _viewer = null;
@@ -19,9 +30,8 @@ const enterHomescreen = () => {
             });
         });
     });
-    _button_useWebVR = _makeButton("USE WebVR", () => {
-        document.body.removeChild(_button_useStereoEffect);
-        document.body.removeChild(_button_useWebVR);
+    _makeButton("USE WebVR", () => {
+        _clearButtons();
 
         // Switch to the fullscreen, which is the last step of starting process,
         // requires that it's initiated by user action, which will
@@ -34,8 +44,8 @@ const enterHomescreen = () => {
             enterHomescreen();
         });
 
-        _button_startVR = _makeButton('START VR', () => {
-            document.body.removeChild(_button_startVR);
+        _makeButton('START VR', () => {
+            _clearButtons();
             _viewer.start();
         });
     });
@@ -47,7 +57,11 @@ const _makeButton = (title, evHandler) => {
     newButton.addEventListener('click', evHandler);
     document.body.appendChild(newButton);
 
-    return(newButton);
+    _buttons.push(newButton);
+}
+
+const _clearButtons = () => {
+    _buttons.splice(0, _buttons.length).map(oneButtom => document.body.removeChild(oneButtom));
 }
 
 const textureUrlGet = () => {
