@@ -1,10 +1,12 @@
 import {StereoEffect} from './StereoEffect';
 import {Scene, PerspectiveCamera,WebGLRenderer, HemisphereLight, Clock} from 'three';
+import {StereoCamera} from './StereoCamera';
 import DeviceOrientationControls from 'three.orientation';
 import OrbitControls from 'threejs-orbit-controls';
 import {Photosphere} from './Photosphere';
 import './ES5Polyfill';
 import { FullScreenUtil } from './FullScreenUtil';
+import { DistortionShader } from './DistortionShader';
 
 export class StereoEffectViewer {
     constructor(textureFileUrl, exitHandler) {
@@ -15,7 +17,8 @@ export class StereoEffectViewer {
 
         this.setupRenderer();
         this.setupCamera();
-        this.setupStereo();
+//        this.setupStereo();
+        this.setupDistortion();
 		this.setupLight();
 		this.setupControls();
      
@@ -64,21 +67,28 @@ export class StereoEffectViewer {
 
 		// http://threejs.org/docs/#Reference/Cameras/PerspectiveCamera
 		this.camera = new PerspectiveCamera(fieldOfView, aspectRatio, near, far);
-		this.camera.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z);
+        this.camera.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z);
+        
+        // https://rawgit.com/owntheweb/three.js/dev/examples/vr_effect_composer_stereo_camera.html
+        this.stereoCamera = new StereoCamera();
 
         this.scene.add(this.camera);
     }
 
     setupStereo() {
-        this.effect = new StereoEffect(this.renderer);
-
-        this.effect.setEyeSeparation(-6);
-
+//        this.effect = new StereoEffect(this.renderer);
+//
+//        this.effect.setEyeSeparation(-6);
 //        this.eyeSeparation = -10;
 //
 //        this.renderer.domElement.addEventListener('click', () => {
 //            this.effect.setEyeSeparation(this.eyeSeparation++);
 //        });  
+    }
+
+    setupDistortion() {
+        this.distortionShader = new DistortionShader(this.renderer, this.camera, this.stereoCamera, this.scene);
+        this.distortionShader.showGUI();
     }
 
     setupLight() {
@@ -119,7 +129,9 @@ export class StereoEffectViewer {
         const dt = this.clock.getDelta();
 
         this.controls.update(dt);
-        this.effect.render(this.scene, this.camera);
+        this.stereoCamera.update(this.scene, this.camera, this.width, this.height);
+//        this.effect.render(this.scene, this.camera);
+        this.distortionShader.render();
 
         // request the next animation frame
         requestAnimationFrame(this.doLoopAnimations);
@@ -135,10 +147,14 @@ export class StereoEffectViewer {
                       width = window.innerWidth,
                       height = window.innerHeight;
   
+                this.width = width;
+                this.height = height;
+
                 this.camera.aspect = width / height;
                 this.camera.updateProjectionMatrix();
         
-                this.effect.setSize(width, height);
+                this.distortionShader.composer.setSize(width, height);
+                // this.effect.setSize(width, height);
                 this.renderer.setSize(width, height);
 
                 this.sizeAdjPending = false;
@@ -150,6 +166,9 @@ export class StereoEffectViewer {
 
     dispose() {
         this.isDisposed = true;
+        if(this.distortionShader) {
+            this.distortionShader.dispose();
+        }
         document.body.removeChild(this.renderer.domElement);
         this.renderer.dispose();
     }

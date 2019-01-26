@@ -4,9 +4,12 @@
   "description": "This is a simple photosphere VR viewer for smartphones.",
   "main": "index.js",
   "dependencies": {
+    "dat.gui": "^0.7.5",
     "device-orientation-controls": "^1.1.0",
     "nosleep.js": "^0.9.0",
+    "npm": "^6.7.0",
     "three": "^0.100.0",
+    "three-effectcomposer-es6": "0.0.4",
     "three-vrcontrols-module": "^2.2.1",
     "three-vreffect-module": "^2.2.0",
     "three.orientation": "^1.1.1",
