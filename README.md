@@ -22,9 +22,17 @@ Make sure to open it in your smartphone (Chrome or Firefox should we fine).
 It might not work so great on larger screens due to the greater distance between center points of each image (due to larger screen). This will hopefully be fixed some day (see *Future roadmap* chapter) 
 
 # Future roadmap
-* try to remove StereoEffect - see
-    * https://stackoverflow.com/questions/31248397/three-js-combining-stereoeffect-with-fxaa-shaderpass
-    * https://rawgit.com/owntheweb/three.js/dev/examples/vr_effect_composer_stereo_camera.html
+Currently I have managed to (in `StereoEffectDistortionViewer.js`):
+* put the camera outside the sphere
+* partially implemented head tracking by rotating the sphere
+* added deformation to the sphere (linked sphere rotation)
+
+There are problems I haven't been able to solve:
+* sphere rotates in the wrong direction around the Y axis
+    * inversion methods I have tried result in incorrect rotation when looking up
+* I have yet to determine correct params for deformation: deformation scale, camera distance, FOV
+
+
 
 ## Basic functionality
 * fix exit VR on smartphones (FOV)
