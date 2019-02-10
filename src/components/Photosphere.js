@@ -1,4 +1,5 @@
-import { Mesh, RepeatWrapping, SphereGeometry, MeshBasicMaterial, BackSide, Matrix4} from 'three';
+import { Mesh, RepeatWrapping, SphereGeometry, MeshBasicMaterial, BackSide, Matrix4, TextureLoader, Quaternion, Vector3, Euler} from 'three';
+import { PitchYawRollHelper } from '../helpers/PitchYawRollHelper';
 
 const _sphere_radius = 100,
       _sphere_H_segments = 64,
@@ -6,47 +7,52 @@ const _sphere_radius = 100,
 
 export class Photosphere {
 
-    constructor(scene, renderer) {
+    constructor(scene, renderer, textureFileUrl) {
         this.scene = scene;
 		this.renderer = renderer;
 		this.scale = 5;
 		
-		this.deformMatrix = new Matrix4();
-    }
+		//this.deformMatrix = new Matrix4();
+		this.makeSphere();
+		this.loadTexture(textureFileUrl);
 
+		this.pyrHelper = new PitchYawRollHelper();
+	}
+	
+	makeSphere() {
+		this.sphereMesh = new Mesh(
+			new SphereGeometry(_sphere_radius, _sphere_H_segments, _sphere_V_segments),
+			new MeshBasicMaterial({
+				// map: loadedTexture,
+				// color: 0xff0000,
+				flatShading: true,
+				// draw texture on inner side of the sphere
+				// side: BackSide
+			})
+
+		);
+
+		this.quaternion = this.sphereMesh.quaternion;
+		this.scene.add(this.sphereMesh);
+	}
+    
 	loadTexture(textureFileUrl) {
+		const loader = new TextureLoader();
 
-		return(new Promise(resolve => {
-			// instantiate a loader
-			const loader = new THREE.TextureLoader();
+		// load a resource
+		loader.load(textureFileUrl,
+			// onLoad callback
+			loadedTexture => {
+				// loadedTexture.anisotropy = this.renderer.capabilities.getMaxAnisotropy();
+				// texture needs to be flipped horizonatally
+				// since rendering it on the inner side of a sphrere
+				// will flip it  
+				loadedTexture.wrapS = RepeatWrapping;
+				loadedTexture.repeat.x=-1;
 
-			// load a resource
-			loader.load(textureFileUrl,
-				// onLoad callback
-				loadedTexture => {
-					loadedTexture.anisotropy = this.renderer.capabilities.getMaxAnisotropy();
-					// texture needs to be flipped horizonatally
-					// since rendering it on the inner side of a sphrere
-					// will flip it  
-					loadedTexture.wrapS = RepeatWrapping;
-					loadedTexture.repeat.x=-1;
-
-					this.sphereMesh = new Mesh(
-						new SphereGeometry(_sphere_radius, _sphere_H_segments, _sphere_V_segments),
-						new MeshBasicMaterial({
-							map: loadedTexture,
-							// color: 0xff0000,
-							flatShading: true,
-							// draw texture on inner side of the sphere
-							side: BackSide
-						})
-
-						);
-					this.scene.add(this.sphereMesh);
-					this.sphereMesh.matrixAutoUpdate = false;
-					resolve();
-			});
-		}));
+				this.sphereMesh.material.map = loadedTexture;
+				this.sphereMesh.material.needsUpdate = true;
+		});
 	}
 
 	updateDeformation(rotQ) {
@@ -85,5 +91,9 @@ export class Photosphere {
 		}
         this.sphereMesh.matrix.identity();
 		this.sphereMesh.matrix.multiply(this.deformMatrix);
+	}
+
+	update(deviceOrientation) {
+		this.quaternion.copy(this.pyrHelper.calculate(deviceOrientation));
 	}
 }

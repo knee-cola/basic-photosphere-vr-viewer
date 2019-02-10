@@ -2,7 +2,6 @@ import {StereoEffect} from './StereoEffect';
 import {Scene, PerspectiveCamera,WebGLRenderer, HemisphereLight, Clock, PlaneGeometry, ShadowMaterial, GridHelper, Mesh} from 'three';
 import {Photosphere} from './Photosphere';
 import './ES5Polyfill';
-import { InvertedOrientationControls } from './InvertedOrientationControls';
 import { FullScreenUtil } from './FullScreenUtil';
 
 export class StereoEffectDistortionViewer {
@@ -11,15 +10,14 @@ export class StereoEffectDistortionViewer {
         // binding methods used as event handlers
         this.adjustSize = this.adjustSize.bind(this);
         this.doLoopAnimations = this.doLoopAnimations.bind(this);
+        this.onDeviceOrientationChangeEvent = this.onDeviceOrientationChangeEvent.bind(this);
 
         this.setupRenderer();
         this.setupCamera();
         this.setupStereo();
         this.setupLight();
      
-        this.loadPhotosphere(textureFileUrl).then(() => {
-            this.setupControls();
-        });
+        this.loadPhotosphere(textureFileUrl);
 
         this.fsUtil = new FullScreenUtil();
 
@@ -35,6 +33,10 @@ export class StereoEffectDistortionViewer {
             this.startAnimationLoop();
             window.addEventListener('resize', this.adjustSize, false);
         });
+
+        this.deviceOrientation = {alpha:0, beta:0, gamma: 0};
+
+		window.addEventListener( 'deviceorientation', this.onDeviceOrientationChangeEvent, false );
 }
     
     setupRenderer() {
@@ -52,6 +54,23 @@ export class StereoEffectDistortionViewer {
 
     setupCamera() {
 
+        const fieldOfView = 90,
+            aspectRatio = 1,
+            near = 1,
+            far = 1000,
+            cameraPosition = {
+                x: -130,
+                y: 0,
+                z: 0
+            };
+
+        // http://threejs.org/docs/#Reference/Cameras/PerspectiveCamera
+        this.camera = new PerspectiveCamera(fieldOfView, aspectRatio, near, far);
+        this.camera.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z);
+
+        this.camera.lookAt(0,0,0);
+
+/*
 		const fieldOfView = 90,
 			aspectRatio = 1,
 			near = 1,
@@ -68,12 +87,12 @@ export class StereoEffectDistortionViewer {
 
         this.camera.lookAt(0,0,0);
         
-        this.scene.add(this.camera);
+        */
     }
 
     setupStereo() {
-        this.effect = new StereoEffect(this.renderer);
-        this.effect.setEyeSeparation(-6);
+//        this.effect = new StereoEffect(this.renderer);
+//        this.effect.setEyeSeparation(-6);
 
 //        this.eyeSeparation = -10;
 //
@@ -87,18 +106,13 @@ export class StereoEffectDistortionViewer {
 		this.scene.add(new HemisphereLight(0xffffff, 0x000000, 1));
     }
 
-    setupControls() {
-        const domEl = this.renderer.domElement;
-
-        this.controls = new InvertedOrientationControls(this.photoSphere.sphereMesh);
-        this.controls.connect();
-        this.controls.update();
-    }
-
     loadPhotosphere(textureFileUrl) {
-        this.photoSphere = new Photosphere(this.scene, this.renderer);
-        return(this.photoSphere.loadTexture(textureFileUrl));
+        this.photoSphere = new Photosphere(this.scene, this.renderer, textureFileUrl);
     }
+
+	onDeviceOrientationChangeEvent( event ) {
+		this.deviceOrientation = event;
+	}
 
     startAnimationLoop() {
         this.clock = new Clock();
@@ -109,13 +123,20 @@ export class StereoEffectDistortionViewer {
         if(this.isDisposed) {
             return;
         }
+
         const dt = this.clock.getDelta();
 
-        if(this.controls) {
-            let rotQ = this.controls.update();
-            this.photoSphere.updateDeformation(rotQ);
-            this.photoSphere.commitDeformation();
+        //if(this.controls) {
+        //    let rotQ = this.controls.update();
+        //    this.photoSphere.updateDeformation(rotQ);
+        //    this.photoSphere.commitDeformation();
+        //}
+
+        if(this.deviceOrientation) {
+            this.photoSphere.update(this.deviceOrientation);
         }
+        
+        this.deviceOrientation = null;
 
         if(this.effect) {
             this.effect.render(this.scene, this.camera);
