@@ -72,7 +72,7 @@ export class PitchYawRollHelper {
     calculate({alpha, beta, gamma}) {
 
         // convert phone orientation angles to Euler
-        this.euler.set( Math.degToRad(beta), - Math.degToRad(alpha), - Math.degToRad(gamma), 'YXZ' ); // 'ZXY' for the device, but 'YXZ' for us
+        this.euler.set( -Math.degToRad(beta), - Math.degToRad(alpha), - Math.degToRad(gamma), 'YXZ' ); // 'ZXY' for the device, but 'YXZ' for us
 
         this.reset();
         this.calcPitchYawQuaternion();
