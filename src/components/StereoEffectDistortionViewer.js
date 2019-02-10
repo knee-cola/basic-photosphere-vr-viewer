@@ -59,7 +59,7 @@ export class StereoEffectDistortionViewer {
             near = 1,
             far = 1000,
             cameraPosition = {
-                x: -130,
+                x: -140,
                 y: 0,
                 z: 0
             };
@@ -69,30 +69,11 @@ export class StereoEffectDistortionViewer {
         this.camera.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z);
 
         this.camera.lookAt(0,0,0);
-
-/*
-		const fieldOfView = 90,
-			aspectRatio = 1,
-			near = 1,
-			far = 1000,
-            cameraPosition = {
-                x: 300,
-                y: 0,
-                z: 0
-            };
-
-		// http://threejs.org/docs/#Reference/Cameras/PerspectiveCamera
-		this.camera = new PerspectiveCamera(fieldOfView, aspectRatio, near, far);
-        this.camera.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z);
-
-        this.camera.lookAt(0,0,0);
-        
-        */
     }
 
     setupStereo() {
-//        this.effect = new StereoEffect(this.renderer);
-//        this.effect.setEyeSeparation(-6);
+        this.effect = new StereoEffect(this.renderer);
+        this.effect.setEyeSeparation(-6);
 
 //        this.eyeSeparation = -10;
 //
